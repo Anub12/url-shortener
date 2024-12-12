@@ -13,10 +13,61 @@ function generateShortUrl() {
 // Serve the homepage with a URL sumbission form
 app.get('/', (req, res) => {
     res.send(`
-        <form action="/shorten" method="POST">
-            <input type="text" name="url" placeholder="Enter URL" required />
-            <button type="submit">Shorten</button>
-        </form>
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>URL Shortener</title>
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+            <style>
+                body {
+                    background-color: #f8f9fa;
+                    font-family: Arial, sans-serif;
+                }
+                .container {
+                    max-width: 600px;
+                    margin-top: 50px;
+                }
+                .short-url {
+                    font-size: 18px;
+                    font-weight: bold;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h2 class="text-center mb-4">URL Shortener</h2>
+                <form action="/shorten" method="POST">
+                    <div class="input-group">
+                        <input type="url" name="url" class="form-control" placeholder="Enter URL" required />
+                        <button type="submit" class="btn btn-primary">Shorten</button>
+                    </div>
+                </form>
+                <div id="short-url-result" class="mt-4"></div>
+            </div>
+
+            <script>
+                // Display result dynamically after form submission
+                const form = document.querySelector('form');
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const urlInput = document.querySelector('[name="url"]');
+                    const url = urlInput.value;
+                    fetch('/shorten', {
+                        method: 'POST',
+                        body: new URLSearchParams({ url: url }),
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+                    })
+                    .then(response => response.text())
+                    .then(data => {
+                        document.getElementById('short-url-result').innerHTML = data;
+                        urlInput.value = ''; // Clear the input field after submission
+                    });
+                });
+            </script>
+        </body>
+        </html>
     `);
 });
 
